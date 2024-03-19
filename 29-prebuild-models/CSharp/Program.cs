@@ -11,14 +11,26 @@ Console.WriteLine("\nConnecting to Forms Recognizer at: {0}", endpoint);
 Console.WriteLine("Analyzing invoice at: {0}\n", fileUri.ToString());
 
 // Create the client
+var cred = new AzureKeyCredential(apiKey);
+var client = new DocumentAnalysisClient(new Uri(endpoint), cred);
 
 // Analyze the invoice
+AnalyzeDocumentOperation operation = await client.AnalyzeDocumentFromUriAsync(WaitUntil.Completed, "prebuilt-invoice", fileUri);
+await operation.WaitForCompletionAsync();
 
 // Display invoice information to the user
+AnalyzeResult result = operation.Value;
 
-
-
-
+foreach (AnalyzedDocument invoice in result.Documents)
+{
+    if (invoice.Fields.TryGetValue("VendorName", out DocumentField? vendorNameField))
+    {
+        if (vendorNameField.FieldType == DocumentFieldType.String)
+        {
+            string vendorName = vendorNameField.Value.AsString();
+            Console.WriteLine($"Vendor Name: '{vendorName}', with confidence {vendorNameField.Confidence}.");
+        }
+    }
 
     if (invoice.Fields.TryGetValue("CustomerName", out DocumentField? customerNameField))
     {
