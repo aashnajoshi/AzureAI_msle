@@ -1,12 +1,10 @@
-from dotenv import load_dotenv
-import os
+from azure.cognitiveservices.language.luis.runtime import LUISRuntimeClient
+from msrest.authentication import CognitiveServicesCredentials
 import json
 from datetime import datetime, timedelta, date
 from dateutil.parser import parse as is_date
-
-# Import namespaces
-from azure.cognitiveservices.language.luis.runtime import LUISRuntimeClient
-from msrest.authentication import CognitiveServicesCredentials
+from dotenv import load_dotenv
+import os
 
 def main():
 
@@ -17,19 +15,13 @@ def main():
         lu_prediction_region = os.getenv('LU_PREDICTION_REGION')
         lu_prediction_key = os.getenv('LU_PREDICTION_KEY')
 
-        # Configure speech service and get intent recognizer
         endpoint = f"https://{lu_prediction_region}.api.cognitive.microsoft.com"
         credentials = CognitiveServicesCredentials(lu_prediction_key)
         client = LUISRuntimeClient(endpoint, credentials)
-
-        # Get the model from the AppID and add the intents we want to use
         model = client.prediction.get_slot_prediction(lu_app_id, "production")
-
-        # Process speech input
         speech_input = "What's the time in New York?"
         intent = GetIntent(speech_input, model)
         print("Intent:", intent)
-
         entities = GetEntities(speech_input, model)
         print("Entities:", entities)
 
@@ -39,10 +31,7 @@ def main():
 def GetTime(location):
     time_string = ''
 
-    # Note: To keep things simple, we'll ignore daylight savings time and support only a few cities.
-    # In a real app, you'd likely use a web service API (or write  more complex code!)
-    # Hopefully this simplified example is enough to get the the idea that you
-    # use LU to determine the intent and entitites, then implement the appropriate logic
+    # Note: To keep things simple, we'll ignore daylight savings time and support only a few cities.In a real app, you'd likely use a web service API (or write  more complex code!)
 
     if location.lower() == 'local':
         now = datetime.now()
@@ -72,23 +61,13 @@ def GetTime(location):
 
 def GetDate(day):
     date_string = 'I can only determine dates for today or named days of the week.'
-
-    weekdays = {
-        "monday":0,
-        "tuesday":1,
-        "wednesday":2,
-        "thusday":3,
-        "friday":4,
-        "saturday":5,
-        "sunday":6
-    }
-
+    weekdays = {"monday":0,"tuesday":1,"wednesday":2,"thusday":3,"friday":4,"saturday":5,"sunday":6}
     today = date.today()
-
-    # To keep things simple, assume the named day is in the current week (Sunday to Saturday)
     day = day.lower()
+
     if day == 'today':
         date_string = today.strftime("%m/%d/%Y")
+
     elif day in weekdays:
         todayNum = today.weekday()
         weekDayNum = weekdays[day]
@@ -104,6 +83,7 @@ def GetDay(date_string):
         day_string = date_object.strftime("%A")
     except:
         day_string = 'Enter a date in MM/DD/YYYY format.'
+        
     return day_string
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
-from dotenv import load_dotenv
-import os
 from azure.ai.textanalytics import TextAnalyticsClient
 from azure.core.credentials import AzureKeyCredential
+from dotenv import load_dotenv
+import os
 
 def main():
     global cog_endpoint
@@ -13,7 +13,6 @@ def main():
         cog_endpoint = os.getenv('COG_SERVICE_ENDPOINT')
         cog_key = os.getenv('COG_SERVICE_KEY')
 
-        # Get user input (until they enter "quit")
         userText =''
         while userText.lower() != 'quit':
             userText = input('\nEnter some text ("quit" to stop)\n')
@@ -25,12 +24,9 @@ def main():
         print(ex)
 
 def GetLanguage(text):
-
-    # Create client using endpoint and key
     credential = AzureKeyCredential(cog_key)
     client = TextAnalyticsClient(endpoint=cog_endpoint, credential=credential)
 
-    # Call the service to get the detected language
     detectedLanguage = client.detect_language(documents = [text])[0]
     return detectedLanguage.primary_language.name
 

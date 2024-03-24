@@ -1,25 +1,21 @@
-from dotenv import load_dotenv
-from datetime import datetime
-import os
-from playsound import playsound
-
-# Import namespaces
 import azure.cognitiveservices.speech as speech_sdk
+from datetime import datetime
+from playsound import playsound
+from dotenv import load_dotenv
+import os
 
 def main():
     try:
         global speech_config
 
-        # Get Configuration Settings
         load_dotenv()
+
+        # Get Configuration Settings
         ai_key = os.getenv('SPEECH_KEY')
         ai_region = os.getenv('SPEECH_REGION')
 
-        # Configure speech service
         speech_config = speech_sdk.SpeechConfig(ai_key, ai_region)
         print('Ready to use speech service in:', speech_config.region)        
-
-        # Get spoken input
         command = TranscribeCommand()
         if command.lower() == 'what time is it?':
             TellTime()
@@ -29,7 +25,6 @@ def main():
 
 def TranscribeCommand():
     command = ''
-
     # Configure speech recognition (for microphone)
     # audio_config = speech_sdk.AudioConfig(use_default_microphone=True)
     # speech_recognizer = speech_sdk.SpeechRecognizer(speech_config, audio_config)
@@ -53,8 +48,6 @@ def TranscribeCommand():
             cancellation = speech.cancellation_details
             print(cancellation.reason)
             print(cancellation.error_details)
-
-    # Return the command
     return command
 
 def TellTime():
@@ -71,19 +64,11 @@ def TellTime():
     #     print(speak.reason)
 
     # Synthesize spoken output
-    responseSsml = " \
-        <speak version='1.0' xmlns='http://www.w3org/2001/10/synthesis' xml:lang='en-US'> \
-            <voice name='en-GB-LibbyNeural'> \
-                {} \
-                <break strength='weak'/> \
-                Time to end this lab! \
-            </voice> \
-        </speak>".format(response_text)
+    responseSsml = " \ <speak version='1.0' xmlns='http://www.w3org/2001/10/synthesis' xml:lang='en-US'> \ <voice name='en-GB-LibbyNeural'> \ {} \ <break strength='weak'/> \ Time to end this lab! \ </voice> \ </speak>".format(response_text)
     speak = speech_synthesizer.speak_ssml_asyn(responseSsml).get()
+    
     if speak.reason != speech_sdk.ResultReasonSynthesizingAudioCompleted:
         print(speak.reason)
-
-    # Print the response
     print(response_text)
 
 if __name__ == "__main__":
