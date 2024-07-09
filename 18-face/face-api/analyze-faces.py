@@ -1,4 +1,6 @@
-from azure.cognitiveservices.vision.face import FaceClient
+#pip install azure-cognitiveservices-vision-face==0.6.0
+
+from azure.cognitiveservices.vision.face import FaceClient 
 from azure.cognitiveservices.vision.face.models import FaceAttributeType
 from msrest.authentication import CognitiveServicesCredentials
 from PIL import Image, ImageDraw
@@ -12,10 +14,8 @@ def main():
     try:
         load_dotenv()
 
-        # Get Configuration Settings
         cog_endpoint = os.getenv('AI_SERVICE_ENDPOINT')
         cog_key = os.getenv('AI_SERVICE_KEY')
-
         credentials = CognitiveServicesCredentials(cog_key)
         face_client = FaceClient(cog_endpoint, credentials)
         print('1: Detect faces\nAny other key to quit')

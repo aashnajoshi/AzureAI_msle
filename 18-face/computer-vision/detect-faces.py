@@ -1,4 +1,4 @@
-import azure.ai.vision as sdk
+import azure.ai.vision as sdk # pip install azure-ai-vision==0.15.1b1
 from ast import Gt
 from array import array
 from PIL import Image, ImageDraw
