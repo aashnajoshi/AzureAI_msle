@@ -1,4 +1,4 @@
-from azure.ai.textanalytics import TextAnalyticsClient
+from azure.ai.textanalytics import TextAnalyticsClient #azure-ai-textanalytics==5.3.0
 from azure.core.credentials import AzureKeyCredential
 from azure.keyvault.secrets import SecretClient
 from azure.identity import ClientSecretCredential
