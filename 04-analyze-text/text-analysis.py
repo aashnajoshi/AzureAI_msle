@@ -1,5 +1,5 @@
 from azure.core.credentials import AzureKeyCredential
-from azure.ai.textanalytics import TextAnalyticsClient
+from azure.ai.textanalytics import TextAnalyticsClient #azure-ai-textanalytics==5.3.0
 from dotenv import load_dotenv
 import os
 
