@@ -1,6 +1,4 @@
-# DEPRECATED
-
-This repo is no longer supported. The lab files for course AI-102 (and other AI-related courses) are distributed across multiple repo's:
+This repo is compilation of lab files for course AI-102 (and other AI-related courses), which are distributed across multiple repo's:
 
 - https://github.com/MicrosoftLearning/mslearn-ai-services
 - https://github.com/MicrosoftLearning/mslearn-ai-vision
