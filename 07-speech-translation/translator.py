@@ -4,76 +4,51 @@ from dotenv import load_dotenv
 import os
 
 def main():
-    try:
-        global speech_config
-        global translation_config
-        
-        # Get Configuration Settings
-        load_dotenv()
-        ai_key = os.getenv('SPEECH_KEY')
-        ai_region = os.getenv('SPEECH_REGION')
+    load_dotenv()
+    ai_key = os.getenv('SPEECH_KEY')
+    ai_region = os.getenv('SPEECH_REGION')
 
-        # Configure translation
-        translation_config = speech_sdk.translation.SpeechTranslationConfig(ai_key, ai_region)
-        translation_config.speech_recognition_language = 'en-US'
-        translation_config.add_target_language('fr')
-        translation_config.add_target_language('es')
-        translation_config.add_target_language('hi')
-        print('Ready to translate from', translation_config.speech_recognition_language)
+    # Configure translation and speech
+    translation_config = speech_sdk.translation.SpeechTranslationConfig(ai_key, ai_region)
+    translation_config.speech_recognition_language = 'en-US'
+    translation_config.add_target_language('fr')
+    translation_config.add_target_language('es')
+    translation_config.add_target_language('hi')
+    print('Ready to translate from', translation_config.speech_recognition_language)
 
-        # Configure speech
-        speech_config = speech_sdk.SpeechConfig(ai_key, ai_region)
+    speech_config = speech_sdk.SpeechConfig(ai_key, ai_region)
 
-        # Get user input
-        targetLanguage = ''
-        while targetLanguage != 'quit':
-            targetLanguage = input('\nEnter a target language\n fr = French\n es = Spanish\n hi = Hindi\n Enter anything else to stop\n').lower()
-            if targetLanguage in translation_config.target_languages:
-                input_method = input("Choose input method: 'mic' for microphone or 'file' for audio file: ").lower()
-                Translate(targetLanguage, input_method)
-            else:
-                targetLanguage = 'quit'
+    while True:
+        targetLanguage = input('\nEnter a target language (fr, es, hi) or "quit" to stop: ').lower()
+        if targetLanguage == 'quit':
+            break
+        if targetLanguage in translation_config.target_languages:
+            input_method = input("Choose input method (1: mic, 2: file): ").strip()
+            translate(targetLanguage, input_method, translation_config, speech_config)
+        else:
+            print("Invalid language.")
 
-    except Exception as ex:
-        print(ex)
-
-def Translate(targetLanguage, input_method):
-    translation = ''
+def translate(targetLanguage, input_method, translation_config, speech_config):
+    audio_config = speech_sdk.AudioConfig(use_default_microphone=True) if input_method == '1' else speech_sdk.AudioConfig(filename='station.wav')
     
-    if input_method == 'mic':
-        # Translate speech from microphone
-        audio_config = speech_sdk.AudioConfig(use_default_microphone=True)
-        translator = speech_sdk.translation.TranslationRecognizer(translation_config, audio_config=audio_config)
-        
+    if input_method == '1':
         print("Speak now...")
-        result = translator.recognize_once_async().get()
-        print('Translating "{}"'.format(result.text))
-        translation = result.translations[targetLanguage]
-        print(translation)
-
-    elif input_method == 'file':
-        # Translate speech from audio file
-        audioFile = 'station.wav'
-        playsound(audioFile)  # Play the audio file
-        audio_config = speech_sdk.AudioConfig(filename=audioFile)
-        translator = speech_sdk.translation.TranslationRecognizer(translation_config, audio_config=audio_config)
-        
-        print("Getting speech from file...")
-        result = translator.recognize_once_async().get()
-        print('Translating "{}"'.format(result.text))
-        translation = result.translations[targetLanguage]
-        print(translation)
-
     else:
-        print("Invalid input method. Please choose 'mic' or 'file'.")
-        return
+        playsound('station.wav')
+        print("Getting speech from file...")
 
-    # Synthesize translation
-    voices = {
-        "fr": "fr-FR-HenriNeural",
-        "es": "es-ES-ElviraNeural",
-        "hi": "hi-IN-MadhurNeural"
-    }
+    translator = speech_sdk.translation.TranslationRecognizer(translation_config, audio_config=audio_config)
+    result = translator.recognize_once_async().get()
+
+    if result.reason == speech_sdk.ResultReason.RecognizedSpeech:
+        translation = result.translations[targetLanguage]
+        print(f'Translating "{result.text}": {translation}')
+        synthesize(translation, targetLanguage, speech_config)
+    else:
+        print("Recognition failed:", result.reason)
+
+def synthesize(translation, targetLanguage, speech_config):
+    voices = {"fr": "fr-FR-HenriNeural", "es": "es-ES-ElviraNeural", "hi": "hi-IN-MadhurNeural"}
     speech_config.speech_synthesis_voice_name = voices.get(targetLanguage)
     speech_synthesizer = speech_sdk.SpeechSynthesizer(speech_config)
     speak = speech_synthesizer.speak_text_async(translation).get()
