@@ -1,4 +1,4 @@
-import azure.cognitiveservices.speech as speech_sdk
+import azure.cognitiveservices.speech as speech_sdk #azure-cognitiveservices-speech==1.30.0
 from datetime import datetime
 from playsound import playsound
 from dotenv import load_dotenv
