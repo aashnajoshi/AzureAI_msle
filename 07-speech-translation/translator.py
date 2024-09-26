@@ -1,4 +1,4 @@
-from azure.cognitiveservices.speech import SpeechConfig, AudioConfig, SpeechSynthesizer, TranslationRecognizer
+from azure.cognitiveservices.speech import SpeechConfig, AudioConfig, SpeechSynthesizer, TranslationRecognizer #azure-cognitiveservices-speech==1.30.0
 from azure.cognitiveservices.translation import TranslationServiceClient
 from msrest.authentication import CognitiveServicesCredentials
 from datetime import datetime
