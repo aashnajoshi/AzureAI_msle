@@ -1,5 +1,4 @@
-# openai==1.2.00
-from openai import AzureOpenAI
+from openai import AzureOpenAI #openai==1.13.3
 from dotenv import load_dotenv
 import os
 import json
@@ -23,15 +22,12 @@ def main():
 
         text = input('\nEnter a question:\n')
         extension_config = dict(dataSources = [  
-                { 
-                    "type": "AzureCognitiveSearch", 
+                {   "type": "AzureCognitiveSearch", 
                     "parameters": { 
                         "endpoint":azure_search_endpoint, 
                         "key": azure_search_key, 
                         "indexName": azure_search_index,
-                    }
-                }]
-                )
+                    }}])
 
         print("...Sending the following request to Azure OpenAI endpoint...")
         print("Request: " + text + "\n")
@@ -42,10 +38,8 @@ def main():
             max_tokens = 1000,
             messages = [
                 {"role": "system", "content": "You are a helpful travel agent"},
-                {"role": "user", "content": text}
-            ],
-            extra_body = extension_config
-        )
+                {"role": "user", "content": text}],
+            extra_body = extension_config)
 
         print("Response: " + response.choices[0].message.content + "\n")
         print("\nContext information:\n")
