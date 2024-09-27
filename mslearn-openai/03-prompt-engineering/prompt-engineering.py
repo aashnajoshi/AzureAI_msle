@@ -1,5 +1,4 @@
-# openai==1.2.00
-from openai import AzureOpenAI
+from openai import AzureOpenAI #openai==1.13.3
 from dotenv import load_dotenv
 import os
 
@@ -8,12 +7,10 @@ printFullResponse = False
 def main(): 
         
     try: 
-        # Get configuration settings 
         load_dotenv()
         azure_oai_endpoint = os.getenv("AZURE_OAI_ENDPOINT")
         azure_oai_key = os.getenv("AZURE_OAI_KEY")
         azure_oai_deployment = os.getenv("AZURE_OAI_DEPLOYMENT")
-
         client = AzureOpenAI(azure_endpoint = azure_oai_endpoint, api_key=azure_oai_key, api_version="2023-05-15")
 
         while True:
@@ -43,12 +40,10 @@ def call_openai_model(messages, model, client):
     print("User message: " + user_message)
 
     messages =[{"role": "system", "content": system_message}, {"role": "user", "content": user_message},]
-    
     response = client.chat.completions.create(model=model, messages=messages, temperature=0.7, max_tokens=800)
     
     if printFullResponse:
         print(response)
-
     print("Completion: \n\n" + response.choices[0].message.content + "\n")
 
 if __name__ == '__main__': 
