@@ -1,5 +1,5 @@
+from azure.ai.formrecognizer import DocumentAnalysisClient #azure-ai-formrecognizer==3.3.3
 from azure.core.credentials import AzureKeyCredential
-from azure.ai.formrecognizer import DocumentAnalysisClient
 from dotenv import load_dotenv
 import os
 
