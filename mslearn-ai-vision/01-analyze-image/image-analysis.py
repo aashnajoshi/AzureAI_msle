@@ -1,4 +1,4 @@
-from azure.ai.vision.imageanalysis import ImageAnalysisClient  # azure-ai-vision-imageanalysis==1.0.0b1
+from azure.ai.vision.imageanalysis import ImageAnalysisClient  # azure-ai-vision-imageanalysis==1.0.0b3
 from azure.ai.vision.imageanalysis.models import VisualFeatures
 from azure.core.credentials import AzureKeyCredential
 import sys
