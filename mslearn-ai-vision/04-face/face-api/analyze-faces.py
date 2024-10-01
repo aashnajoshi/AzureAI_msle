@@ -1,6 +1,4 @@
-#pip install azure-cognitiveservices-vision-face==0.6.0
-
-from azure.cognitiveservices.vision.face import FaceClient 
+from azure.cognitiveservices.vision.face import FaceClient  #azure-cognitiveservices-vision-face==0.6.0
 from azure.cognitiveservices.vision.face.models import FaceAttributeType
 from msrest.authentication import CognitiveServicesCredentials
 from PIL import Image, ImageDraw
@@ -13,7 +11,6 @@ def main():
 
     try:
         load_dotenv()
-
         cog_endpoint = os.getenv('AI_SERVICE_ENDPOINT')
         cog_key = os.getenv('AI_SERVICE_KEY')
         credentials = CognitiveServicesCredentials(cog_key)
@@ -41,26 +38,34 @@ def DetectFaces(image_file):
         draw = ImageDraw.Draw(image)
         color = 'lightgreen'
         face_count = 0
+
         for face in detected_faces:
             face_count += 1
             print('\nFace number {}'.format(face_count))
             detected_attributes = face.face_attributes.as_dict()
+
             if 'blur' in detected_attributes:
                 print(' - Blur:')
+
                 for blur_name in detected_attributes['blur']:
                     print('   - {}: {}'.format(blur_name, detected_attributes['blur'][blur_name]))
+
             if 'occlusion' in detected_attributes:
                 print(' - Occlusion:')
+
                 for occlusion_name in detected_attributes['occlusion']:
                     print('   - {}: {}'.format(occlusion_name, detected_attributes['occlusion'][occlusion_name]))
+
             if 'glasses' in detected_attributes:
                 print(' - Glasses:{}'.format(detected_attributes['glasses']))
+                
             r = face.face_rectangle
             bounding_box = ((r.left, r.top), (r.left + r.width, r.top + r.height))
             draw = ImageDraw.Draw(image)
             draw.rectangle(bounding_box, outline=color, width=5)
             annotation = 'Face number {}'.format(face_count)
             plt.annotate(annotation,(r.left, r.top), backgroundcolor=color)
+
         plt.imshow(image)
         outputfile = 'detected_faces.jpg'
         fig.savefig(outputfile)

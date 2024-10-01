@@ -1,12 +1,11 @@
-import azure.ai.vision as sdk # pip install azure-ai-vision==0.15.1b1
-from ast import Gt
-from array import array
+from azure.ai.vision.imageanalysis import ImageAnalysisClient #azure-ai-vision-imageanalysis==1.0.0b3
+from azure.ai.vision.imageanalysis.models import VisualFeatures
+from azure.core.credentials import AzureKeyCredential
+from dotenv import load_dotenv
 from PIL import Image, ImageDraw
-import sys
-import time
 from matplotlib import pyplot as plt
 import numpy as np
-from dotenv import load_dotenv
+import sys
 import os
 
 def main():
@@ -15,51 +14,47 @@ def main():
     try:
         load_dotenv()
 
-        # Get Configuration Settings
         ai_endpoint = os.getenv('AI_SERVICE_ENDPOINT')
         ai_key = os.getenv('AI_SERVICE_KEY')
-
         image_file = 'images/people.jpg'
+
         if len(sys.argv) > 1:
             image_file = sys.argv[1]
-        cv_client = sdk.VisionServiceOptions(ai_endpoint, ai_key)
-        AnalyzeImage(image_file, cv_client)
+
+        with open(image_file, "rb") as f:
+            image_data = f.read()
+
+        cv_client = ImageAnalysisClient(endpoint=ai_endpoint, credential=AzureKeyCredential(ai_key))
+        AnalyzeImage(image_file, image_data, cv_client)
 
     except Exception as ex:
         print(ex)
 
-def AnalyzeImage(image_file, cv_client):
-    print('\nAnalyzing', image_file)
-    analysis_options = sdk.ImageAnalysisOptions()
-    features = analysis_options.features = (sdk.ImageAnalysisFeature.PEOPLE) 
-    image = sdk.VisionSource(image_file)
-    image_analyzer = sdk.ImageAnalyzer(cv_client, image, analysis_options)
-    result = image_analyzer.analyze()
-    if result.reason == sdk.ImageAnalysisResultReason.ANALYZED:
-        if result.people is not None:
-            print("\nPeople in image:")
-        image = Image.open(image_file)
+def AnalyzeImage(filename, image_data, cv_client):
+    print('\nAnalyzing ', filename)
+    result = cv_client.analyze(image_data=image_data, visual_features=[ VisualFeatures.PEOPLE],)
+    
+    if result.people is not None:
+        print("\nPeople in image:")
+        image = Image.open(filename)
         fig = plt.figure(figsize=(image.width/100, image.height/100))
         plt.axis('off')
         draw = ImageDraw.Draw(image)
         color = 'cyan'
-        for detected_people in result.people:
-            if detected_people.confidence > 0.5:
+
+        for detected_people in result.people.list:
+            if(detected_people.confidence > 0.5):
                 r = detected_people.bounding_box
-                bounding_box = ((r.x, r.y), (r.x + r.w, r.y + r.h))
+                bounding_box = ((r.x, r.y), (r.x + r.width, r.y + r.height))
                 draw.rectangle(bounding_box, outline=color, width=3)
                 print(" {} (confidence: {:.2f}%)".format(detected_people.bounding_box, detected_people.confidence * 100))
+            
         plt.imshow(image)
         plt.tight_layout(pad=0)
-        outputfile = 'detected_people.jpg'
+        
+        outputfile = 'people.jpg'
         fig.savefig(outputfile)
         print('  Results saved in', outputfile)
-    else:
-        error_details = sdk.ImageAnalysisErrorDetails.from_result(result)
-        print(" Analysis failed.")
-        print("   Error reason: {}".format(error_details.reason))
-        print("   Error code: {}".format(error_details.error_code))
-        print("   Error message: {}".format(error_details.message))
 
 if __name__ == "__main__":
     main()
