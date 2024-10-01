@@ -5,7 +5,7 @@ NORMAL=$(tput sgr0)
 GREEN=$(tput setaf 2)
 
 # Set up the resource group
-resourceGroupName=FormsRecognizerResources
+resourceGroupName="FORM_RECOGNIZER_RESOURCE_GROUP"
 printf "${GREEN}Setting up the $resourceGroupName resource group. \n${NORMAL}"
 az group create --location westus --name FormsRecognizerResources
 

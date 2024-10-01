@@ -1,19 +1,18 @@
 # Update these with your service and model values
-$key="<YOUR-KEY>"
-$endpoint="<YOUR-ENDPOINT>"
-$projectName = "customNERLab"
-$modelName = "customExtractAds"
+$key = "YOUR_KEY"
+$endpoint = "YOUR_ENDPOINT"
+$projectName = "YOUR_PROJECT_NAME"
+$modelName = "YOUR_MODEL_NAME"
 $verbose = $false
 
 # Set up headers for API call
 $headers = @{}
 $headers.add("Ocp-Apim-Subscription-Key", $key)
-$headers.add("Content-Type","application/json")
+$headers.add("Content-Type", "application/json")
 
 # Get text to extract entities from
 $text_file = "test1.txt"
-if ($args.count -gt 0)
-{
+if ($args.count -gt 0) {
     $text_file = $args[0]
 }
 
@@ -27,12 +26,12 @@ catch {
 
 # Build body of for API call
 $data = @{
-    "tasks" = @{
+    "tasks"         = @{
         "customEntityRecognitionTasks" = @(
             @{
-                "parameters"= @{
-                      "project-name" = $projectName
-                      "deployment-name" = $modelName
+                "parameters" = @{
+                    "project-name"    = $projectName
+                    "deployment-name" = $modelName
                 }
             }
         )
@@ -40,7 +39,7 @@ $data = @{
     "analysisInput" = @{
         "documents" = @(
             @{
-                "id" = "document_extractEntities"
+                "id"   = "document_extractEntities"
                 "text" = $contents
             }
         )
@@ -50,9 +49,9 @@ $data = @{
 # Post text for entity recognition
 Write-Host("`nSubmitting entity recognition task`n")
 $response = Invoke-WebRequest -Method Post `
-          -Uri "$($endpoint)text/analytics/v3.2-preview.2/analyze" `
-          -Headers $headers `
-          -Body $data
+    -Uri "$($endpoint)text/analytics/v3.2-preview.2/analyze" `
+    -Headers $headers `
+    -Body $data
 
 # Output response if desired
 if ($verbose) {
@@ -72,8 +71,8 @@ $resultHeaders.Add( "Ocp-Apim-Subscription-Key", $key )
 Write-Host "Getting results..."
 Do {
     $result = Invoke-RestMethod -Method Get `
-            -Uri $resultUrl `
-            -Headers $resultHeaders | ConvertTo-Json -Depth 10
+        -Uri $resultUrl `
+        -Headers $resultHeaders | ConvertTo-Json -Depth 10
 
     $analysis = ($result | ConvertFrom-Json)
 } while ($analysis.status -ne "succeeded")
@@ -90,7 +89,7 @@ if ($verbose) {
 
 for (($idx = 0); $idx -lt $docs.Length; $idx++) {
     $item = $docs[$idx] 
-    Write-Host ("Document #", ($idx+1))
+    Write-Host ("Document #", ($idx + 1))
     $entities = $item.entities
     foreach ($entity in $entities) {
         Write-Host ("  - Entity Category: $($entity.category)")

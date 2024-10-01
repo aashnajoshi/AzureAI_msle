@@ -5,7 +5,7 @@ NORMAL=$(tput sgr0)
 GREEN=$(tput setaf 2)
 
 # Set up the resource group
-resourceGroupName=DocumentIntelligenceResources
+resourceGroupName="DOCUMENT_INTELLIGENCE_RESOURCE_GROUP"
 printf "${GREEN}Setting up the DocumentIntelligenceResources resource group. \n${NORMAL}"
 az group create --location westus2 --name DocumentIntelligenceResources
 

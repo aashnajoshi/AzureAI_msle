@@ -1,19 +1,18 @@
 # Update these with your service and model values
-$key="<YOUR-KEY>"
-$endpoint="<YOUR-ENDPOINT>"
-$projectName = "ClassifyLab"
-$deploymentName = "articles"
+$key = "YOUR_KEY"
+$endpoint = "YOUR_ENDPOINT"
+$projectName = "YOUR_PROJECT_NAME"
+$deploymentName = "YOUR_DEPLOYMENT_NAME"
 $verbose = $false
 
 # Set up headers for API call
 $headers = @{}
 $headers.add("Ocp-Apim-Subscription-Key", $key)
-$headers.add("Content-Type","application/json")
+$headers.add("Content-Type", "application/json")
 
 # Get text to classify
 $text_file = "test1.txt"
-if ($args.count -gt 0)
-{
+if ($args.count -gt 0) {
     $text_file = $args[0]
 }
 
@@ -27,12 +26,12 @@ catch {
 
 # Build body of for API call
 $data = @{
-    "tasks" = @(
+    "tasks"         = @(
         @{
-            "kind" = "CustomSingleLabelClassification";
-            "taskName" = "Single Classification Label";
+            "kind"       = "CustomSingleLabelClassification";
+            "taskName"   = "Single Classification Label";
             "parameters" = @{
-                "projectName" = $projectName;
+                "projectName"    = $projectName;
                 "deploymentName" = $deploymentName;
             }
         }
@@ -40,9 +39,9 @@ $data = @{
     "analysisInput" = @{
         "documents" = @(
             @{
-                "id" = "doc1";
+                "id"       = "doc1";
                 "language" = "en-us";
-                "text" = $contents;
+                "text"     = $contents;
             }
         )
     }
@@ -51,9 +50,9 @@ $data = @{
 # Post text for classification
 Write-Host("`n***Submitting text classification task***")
 $response = Invoke-WebRequest -Method Post `
-          -Uri "$($endpoint)language/analyze-text/jobs?api-version=2023-04-01" `
-          -Headers $headers `
-          -Body $data
+    -Uri "$($endpoint)language/analyze-text/jobs?api-version=2023-04-01" `
+    -Headers $headers `
+    -Body $data
 
 # Output response if desired
 if ($verbose) {
@@ -73,8 +72,8 @@ $resultHeaders.Add( "Ocp-Apim-Subscription-Key", $key )
 Write-Host "Getting results..."
 Do {
     $result = Invoke-RestMethod -Method Get `
-            -Uri $resultUrl `
-            -Headers $resultHeaders | ConvertTo-Json -Depth 10
+        -Uri $resultUrl `
+        -Headers $resultHeaders | ConvertTo-Json -Depth 10
 
     $analysis = ($result | ConvertFrom-Json)
 } while ($analysis.status -ne "succeeded")
@@ -91,7 +90,7 @@ if ($verbose) {
 
 for (($idx = 0); $idx -lt $docs.Length; $idx++) {
     $item = $docs[$idx] 
-    Write-Host ("Document #", ($idx+1))
+    Write-Host ("Document #", ($idx + 1))
     Write-Host ("  - Predicted Category: ", $($item.class[0].category))
-    Write-Host ("  - Confidence: ",$($item.class[0].confidenceScore))
+    Write-Host ("  - Confidence: ", $($item.class[0].confidenceScore))
 }
