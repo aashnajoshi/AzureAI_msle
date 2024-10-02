@@ -1,5 +1,4 @@
-# openai==1.2.00
-from openai import AzureOpenAI
+from openai import AzureOpenAI #openai==1.2.00
 from dotenv import load_dotenv
 import os
 
